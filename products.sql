@@ -1,3 +1,4 @@
+drop database sdcproducts;
 Create database sdcproducts;
 \c sdcproducts;
 
@@ -13,15 +14,15 @@ Create database sdcproducts;
 --
 -- ---
 
-DROP TABLE IF EXISTS products;
+DROP TABLE products CASCADE;
 
 CREATE TABLE products (
   id Serial,
-  name VARCHAR(255) NULL,
-  slogan VARCHAR(255) NULL,
-  description VARCHAR(255) NULL,
-  category VARCHAR(255) NULL,
-  default_price VARCHAR(255) NULL,
+  name text NULL,
+  slogan text NULL,
+  description text NULL,
+  category text NULL,
+  default_price text NULL,
   PRIMARY KEY (id)
 );
 
@@ -30,13 +31,13 @@ CREATE TABLE products (
 --
 -- ---
 
-DROP TABLE IF EXISTS skus;
+DROP TABLE skus CASCADE;
 
 CREATE TABLE skus (
-  id INTEGER NULL DEFAULT NULL,
+  id Serial,
   style_id INTEGER NULL DEFAULT NULL,
+  size text NULL,
   quantity INTEGER NULL,
-  size VARCHAR(255) NULL,
   PRIMARY KEY (id)
 );
 
@@ -44,15 +45,16 @@ CREATE TABLE skus (
 -- Table 'styles'
 --
 -- ---
+--index
 
-DROP TABLE IF EXISTS styles;
+DROP TABLE styles CASCADE;
 
 CREATE TABLE styles (
   id serial,
   product_id INTEGER NULL,
-  name VARCHAR(255) NULL,
-  original_price VARCHAR(255) NULL,
-  sale_price VARCHAR(255) NULL,
+  name text NULL,
+  original_price text NULL,
+  sale_price text NULL,
   default_style BOOLEAN NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
@@ -62,13 +64,13 @@ CREATE TABLE styles (
 --
 -- ---
 
-DROP TABLE IF EXISTS photos;
+DROP TABLE photos CASCADE;
 
 CREATE TABLE photos (
   id serial,
   style_id INTEGER NULL,
-  thumbnail_url VARCHAR(255) NULL,
-  url VARCHAR(255) NULL,
+  thumbnail_url text NULL,
+  url text NULL,
   PRIMARY KEY (id)
 );
 
@@ -77,13 +79,13 @@ CREATE TABLE photos (
 --
 -- ---
 
-DROP TABLE IF EXISTS features;
+DROP TABLE features CASCADE;
 
 CREATE TABLE features (
   id serial,
   product_id INTEGER NULL DEFAULT NULL,
-  feature VARCHAR(255) NULL,
-  value VARCHAR(255) NULL,
+  feature text NULL,
+  value text NULL,
   PRIMARY KEY (id)
 );
 
@@ -92,12 +94,12 @@ CREATE TABLE features (
 --
 -- ---
 
-DROP TABLE IF EXISTS related;
+DROP TABLE related CASCADE;
 
 CREATE TABLE related (
   id serial,
-  productid1 INTEGER NULL,
-  productid2 INTEGER NULL,
+  current_product_id INTEGER NULL,
+  related_product_id INTEGER NULL,
   PRIMARY KEY (id)
 );
 
@@ -106,7 +108,7 @@ CREATE TABLE related (
 --
 -- ---
 
-DROP TABLE IF EXISTS cart;
+DROP TABLE cart CASCADE;
 
 CREATE TABLE cart (
   id serial PRIMARY KEY,
@@ -120,10 +122,10 @@ CREATE TABLE cart (
 -- ---
 
 ALTER TABLE skus ADD CONSTRAINT skus_style_id_fkey FOREIGN KEY (style_id) REFERENCES styles(id);
-ALTER TABLE styles ADD CONSTRAINT styles_product_id_fkey FOREIGN KEY (product_id) REFERENCES products (id);
-ALTER TABLE photos ADD CONSTRAINT photos_style_id_fkey FOREIGN KEY (style_id) REFERENCES styles (id);
-ALTER TABLE features ADD CONSTRAINT features_product_id_fkey FOREIGN KEY (product_id) REFERENCES products (id);
-ALTER TABLE related ADD CONSTRAINT related_product_id1_fkey FOREIGN KEY (productid1) REFERENCES products (id);
+ALTER TABLE styles ADD CONSTRAINT styles_product_id_fkey FOREIGN KEY (product_id) REFERENCES products(id);
+ALTER TABLE photos ADD CONSTRAINT photos_style_id_fkey FOREIGN KEY (style_id) REFERENCES styles(id);
+ALTER TABLE features ADD CONSTRAINT features_product_id_fkey FOREIGN KEY (product_id) REFERENCES products(id);
+ALTER TABLE related ADD CONSTRAINT related_current_product_id_fkey FOREIGN KEY (current_product_id) REFERENCES products(id);
 
 
 -- ALTER TABLE `skus` ADD FOREIGN KEY (style_id) REFERENCES `styles` (`id`);
@@ -158,3 +160,19 @@ ALTER TABLE related ADD CONSTRAINT related_product_id1_fkey FOREIGN KEY (product
 -- ('','','','');
 -- INSERT INTO related (id,productid1,productid2) VALUES
 -- ('','','');
+
+CREATE INDEX styles_index ON styles (product_id);
+CREATE INDEX features_index ON features (product_id);
+CREATE INDEX related_index ON related (current_product_id);
+CREATE INDEX skus_index ON skus (style_id);
+CREATE INDEX photos_index ON photos (style_id);
+
+
+
+
+\copy products from './csv/product.csv' WITH (FORMAT csv, HEADER true);
+\copy features from './csv/features.csv' WITH (FORMAT csv, HEADER true);
+\copy styles from './csv/styles.csv' WITH (FORMAT csv, HEADER true);
+\copy skus from './csv/skus.csv' WITH (FORMAT csv, HEADER true);
+\copy related from './csv/related.csv' WITH (FORMAT csv, HEADER true);
+\copy photos from './csv/photos.csv' WITH (FORMAT csv, HEADER true);
