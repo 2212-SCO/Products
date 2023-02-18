@@ -69,8 +69,8 @@ DROP TABLE photos CASCADE;
 CREATE TABLE photos (
   id serial,
   style_id INTEGER NULL,
-  thumbnail_url text NULL,
   url text NULL,
+  thumbnail_url text NULL,
   PRIMARY KEY (id)
 );
 
@@ -175,4 +175,6 @@ CREATE INDEX photos_index ON photos (style_id);
 \copy styles from './csv/styles.csv' WITH (FORMAT csv, HEADER true);
 \copy skus from './csv/skus.csv' WITH (FORMAT csv, HEADER true);
 \copy related from './csv/related.csv' WITH (FORMAT csv, HEADER true);
-\copy photos from './csv/photos.csv' WITH (FORMAT csv, HEADER true);
+\copy photos (id,style_id, url, thumbnail_url) from './csv/photos.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', QUOTE E'\b');
+
+-- WITH CSV DELIMITER E'\t' QUOTE E'\b' NULL AS '';
