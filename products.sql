@@ -53,8 +53,8 @@ CREATE TABLE styles (
   id serial,
   product_id INTEGER NULL,
   name text NULL,
-  original_price text NULL,
   sale_price text NULL,
+  original_price text NULL,
   default_style BOOLEAN NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
@@ -175,6 +175,6 @@ CREATE INDEX photos_index ON photos (style_id);
 \copy styles from './csv/styles.csv' WITH (FORMAT csv, HEADER true);
 \copy skus from './csv/skus.csv' WITH (FORMAT csv, HEADER true);
 \copy related from './csv/related.csv' WITH (FORMAT csv, HEADER true);
-\copy photos (id,style_id, url, thumbnail_url) from './csv/photos.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', QUOTE E'\b');
+\copy photos (id,style_id, url, thumbnail_url) from './csv/photos.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
 
 -- WITH CSV DELIMITER E'\t' QUOTE E'\b' NULL AS '';
